@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-//ОНО НЕ РАБОТАЕТ
 
 using namespace std;
 class route {
@@ -43,41 +42,13 @@ route & route::operator = (const route &ro){ // операция присвое�
 }
 //заполнение матрицы
 void fillCostMatrix(int **costMatrix, int numCity){
-    cout << "Enter the costMatrix (" << numCity << "*" << numCity << "):";
+    cout << "Enter the costMatrix (" << numCity << "*" << numCity << "):\n";
     for (int i = 0; i < numCity; i++){
         for (int j = 0; j < numCity; j++){
             cin >> costMatrix[i][j];
         }
     }
 }
-/*void Permutation (std::vector<int>& P) {
-    int n;
-    n = P.size();
-
-    int i = n - 2;
-    while (i >= 0 && P[i] >= P[i + 1]) {
-        i--;
-    }
-    if (i < 0) {
-        std::cout << "There is no next permutation!!!" << std::endl;
-        return;
-    }
-    else {
-        int j = n - 1;
-        while (P[j] <= P[i]) {
-            j--;
-        }
-        std::swap(P[i], P[j]);
-
-        std::reverse(P.begin() + i + 1, P.end());
-
-        std::cout << "Next permutation: ";
-        for (int num : P) {
-            std::cout << num << " ";
-        }
-        std::cout << std::endl;
-    }
-}*/
 int route::routePrice(int **costMatrix){ // стоимость маршрута по матрице стоимости
     int price = 0;
     for(int i = 0; i < n-1; i++){
@@ -87,7 +58,26 @@ int route::routePrice(int **costMatrix){ // стоимость маршрута 
     return price;
 }
 bool route::nextRoute(){ // вычисляет следующий маршрут
-    return next_permutation(r, r+n);
+    vector<int> P(r, r + n);
+    int i = n - 2;
+    while (i >= 0 && P[i] >= P[i + 1]) {
+        i--;
+    }
+    if (i < 0) {
+        return false;
+    }
+    else {
+        int j = n - 1;
+        while (P[j] <= P[i]) {
+            j--;
+        }
+        swap(P[i], P[j]);
+        reverse(P.begin() + i + 1, P.end());
+        for (int k = 0; k < n; k++) {
+            r[k] = P[k];
+        }
+        return true;
+    }
 }
 ostream &operator << (ostream &os, const route &rt){
     for (int i = 0; i < rt.n; i++){
@@ -98,10 +88,10 @@ ostream &operator << (ostream &os, const route &rt){
 
 
 int main() {
-    int numCity;
+    int numCity; //количество городов
     cout << "Enter the numbers of cities: ";
     cin >> numCity;
-    route rt(numCity);
+    route rt(numCity); // создаём первую перестановку
 
     //матрица стоимости
     int **costMatrix = new int*[numCity];
@@ -110,18 +100,24 @@ int main() {
     }
     fillCostMatrix(costMatrix, numCity);
 
-    cout << "Next route: " << rt << "\n";
-    cout << "Route price: " << rt.routePrice(costMatrix) << "\n";
+    int minPrice = numeric_limits<int>::max();
+    route BestRoute(numCity);
 
-    while(rt.nextRoute()){
-        cout << "Next route: " << rt << "\n";
-        cout << "Route price: " << rt.routePrice(costMatrix) << "\n";
+    do{
+        int currentPrice = rt.routePrice(costMatrix);
+        if(currentPrice < minPrice){
+            minPrice = currentPrice;
+            BestRoute = rt;
+        }
     }
+    while(rt.nextRoute());
 
-    for (int i = 0; i < numCity; i++){
-        delete[]costMatrix[i];
+    cout << "best Route: " << BestRoute << "\n";
+    cout << "Min Price: " << minPrice << "\n";
+
+    for(int i = 0; i < numCity; i++){
+        delete []costMatrix[i];
     }
-    delete[]costMatrix;
-
+    delete []costMatrix;
     return 0;
 }
