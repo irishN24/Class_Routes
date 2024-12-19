@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <algorithm>
 
@@ -24,14 +24,14 @@ route::route(int num) : n(num) {
     }
 }
 // конструктор копирования
-route::route(const route& ro) : n(ro.n) { 
+route::route(const route& ro) : n(ro.n) {
     r = new int[n];
     for (int i = 0; i < n; i++) {
         r[i] = ro.r[i];
     }
 }
 // операция присвоения
-route& route::operator = (const route& ro) { 
+route& route::operator = (const route& ro) {
     if (this != &ro) {
         if (r) delete[]r;
         n = ro.n;
@@ -59,16 +59,24 @@ void fillCostMatrix(int** costMatrix, int numCity) {
     }
 }
 // стоимость маршрута по матрице стоимости
-int route::routePrice(int** costMatrix) { 
+int route::routePrice(int** costMatrix) {
     int price = 0;
     for (int i = 0; i < n - 1; i++) {
+        if(costMatrix[r[i]][r[i + 1]]){
         price += costMatrix[r[i]][r[i + 1]];
+        }
+        else return 0;
     }
-    price += costMatrix[r[n - 1]][r[0]];
+    if(costMatrix[r[n - 1]][r[0]]){
+        price += costMatrix[r[n - 1]][r[0]];
+    }
+    else{
+        return 0;
+    }
     return price;
 }
 // вычисляет следующий маршрут
-bool route::nextRoute() { 
+bool route::nextRoute() {
     vector<int> P(r, r + n);
     int i = n - 2;
     while (i >= 0 && P[i] >= P[i + 1]) {
@@ -116,7 +124,9 @@ int main() {
 
     do {
         int currentPrice = rt.routePrice(costMatrix);
-        if (currentPrice < minPrice) {
+        cout << rt << "\n";
+        cout << currentPrice << "\n";
+        if (currentPrice < minPrice && currentPrice != 0) {
             minPrice = currentPrice;
             BestRoute = rt;
         }
