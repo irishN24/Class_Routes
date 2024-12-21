@@ -82,7 +82,7 @@ bool route::nextRoute() {
     while (i >= 0 && P[i] >= P[i + 1]) {
         i--;
     }
-    if (i < 0) {
+    if (i <= 0) {
         return false;
     }
     else {
@@ -120,6 +120,7 @@ int main() {
     fillCostMatrix(costMatrix, numCity);
 
     int minPrice = numeric_limits<int>::max();
+    int maxPrice = numeric_limits<int>::max();
     route BestRoute(numCity);
 
     do {
@@ -131,9 +132,13 @@ int main() {
             BestRoute = rt;
         }
     } while (rt.nextRoute());
-
-    cout << "best Route: " << BestRoute << "\n";
-    cout << "Min Price: " << minPrice << "\n";
+    if (minPrice == maxPrice){
+        cout << "Route not found" << "\n";
+    }
+    else{
+        cout << "best Route: " << BestRoute << "\n";
+        cout << "Min Price: " << minPrice << "\n";
+    }
 
     for (int i = 0; i < numCity; i++) {
         delete[]costMatrix[i];
